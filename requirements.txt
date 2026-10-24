@@ -1,0 +1,2 @@
+# Optional UI dependencies (bootstrap.py includes pure stdlib ANSI fallbacks)
+rich>=13.0.0

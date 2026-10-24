@@ -1,0 +1,115 @@
+# =============================================================================
+# Core & Navigation
+# =============================================================================
+alias c="clear"
+alias q="exit"
+alias path='echo -e ${PATH//:/\\n}'
+alias zshconfig="micro ~/.zshrc"
+alias aliasconfig="micro ~/.zsh_aliases"
+alias zshreload="source ~/.zshrc"
+alias reload="source ~/.zshrc"
+
+# Safer File Operations
+alias cp="cp -iv"
+alias mv="mv -iv"
+alias rm="rm -I"
+alias mkdir="mkdir -pv"
+
+# Modern CLI Replacements (eza, bat)
+alias ls="eza -lh --color=auto --icons=auto --group-directories-first --git"
+alias la="eza -lha --color=auto --icons=auto --group-directories-first"
+alias ll="eza -lh --color=auto --icons=auto --group-directories-first"
+alias l="eza -lah --color=auto --icons=auto --group-directories-first --git"
+alias lt="eza -a --tree --level=3 --long --icons --git"
+alias tree="eza --tree --icons=auto --level=2"
+alias grep="grep --color=auto"
+alias cat='bat --paging=never'
+alias less='bat --style=plain'
+
+# =============================================================================
+# Git & Jujutsu
+# =============================================================================
+alias gs="git status"
+alias ga="git add"
+alias gaa="git add -A"
+alias gc="git commit"
+alias gcm="git commit -m"
+alias gca="git commit --amend"
+alias gcan="git commit --amend --no-edit"
+alias gp="git push"
+alias gpf="git push --force-with-lease"
+alias gpl="git pull"
+alias gl="git log --oneline --graph --decorate"
+alias gd="git diff"
+alias gds="git diff --staged"
+alias gco="git checkout"
+alias gcb="git checkout -b"
+alias gsw="git switch"
+alias gsc="git switch -c"
+alias gb="git branch"
+alias gba="git branch -a"
+alias gst="git stash"
+alias gstp="git stash pop"
+alias gundo="git reset --soft HEAD~1"
+alias lg="lazygit"
+
+# =============================================================================
+# Development: .NET
+# =============================================================================
+alias d=dotnet
+alias db="dotnet build"
+alias dw="dotnet watch"
+alias dr="dotnet run"
+alias dt="dotnet test"
+alias dclean="dotnet clean"
+alias dres="dotnet restore"
+alias dadd="dotnet add package"
+alias dpub="dotnet publish -c Release"
+alias dlist="dotnet list package"
+
+# =============================================================================
+# Development: Node & NPM
+# =============================================================================
+alias ni="npm install"
+alias nid="npm install --save-dev"
+alias nr="npm run"
+alias ns="npm start"
+alias nb="npm run build"
+alias nt="npm test"
+
+# =============================================================================
+# Development: Mise
+# =============================================================================
+alias mr="mise run"
+alias mi="mise install"
+alias mu="mise upgrade"
+alias mls="mise ls"
+
+# =============================================================================
+# Containers: Docker & Podman
+# =============================================================================
+alias dco="docker compose"
+alias dup="docker compose up -d"
+alias ddown="docker compose down"
+alias dps="docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
+alias dimg="docker images"
+alias dlogs="docker logs -f"
+alias dexec="docker exec -it"
+alias dstop="docker stop \$(docker ps -q 2>/dev/null)"
+alias lzd="lazydocker"
+
+# =============================================================================
+# System & Package Management (Fedora / DNF5 / Systemd)
+# =============================================================================
+alias dnfupd="sudo dnf upgrade --refresh"
+alias dnfclean="sudo dnf clean all"
+alias dnfin="sudo dnf install -y"
+alias dnfrm="sudo dnf remove -y"
+alias sc="sudo systemctl"
+alias scu="systemctl --user"
+alias jctl="journalctl -xeu"
+alias ports="sudo ss -tulpn"
+alias mem="free -h"
+alias disk="df -h"
+alias sysinfo="fastfetch"
+alias myip="curl -s https://ipinfo.io/json | jq"

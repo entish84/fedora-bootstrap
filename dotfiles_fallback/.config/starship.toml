@@ -1,0 +1,133 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+palette = "charcoal_amber"
+
+# Two-line layout: Path, Git/JJ, and subtle Language Runtimes on Line 1
+# Active Venv and Modern Prompt Character on Line 2
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$jj_bookmark\
+$jj_status\
+$dotnet\
+$python\
+$nodejs\
+$rust\
+$golang\
+$cmd_duration\
+$line_break\
+$character"""
+
+# Custom Palette matching Kitty (#222831 / #393e46 / #ffd369 / #eeeeee)
+[palettes.charcoal_amber]
+charcoal   = "#222831"
+slate      = "#393e46"
+muted_grey = "#7f848e"
+amber      = "#ffd369"
+soft_white = "#eeeeee"
+coral      = "#e06c75"
+sage       = "#98c379"
+steel_blue = "#61afef"
+frost_teal = "#56b6c2"
+mauve      = "#c678dd"
+
+[username]
+style_user = "bold amber"
+style_root = "bold coral"
+format = "[$user]($style) "
+
+[hostname]
+ssh_only = true
+style = "dimmed soft_white"
+format = "[@$hostname]($style) "
+
+[directory]
+style = "bold steel_blue"
+read_only = " 󰌾"
+read_only_style = "coral"
+truncation_length = 3
+truncate_to_repo = true
+
+# --- MODERN PROMPT CHARACTER ---
+[character]
+success_symbol = "[❱](bold amber)"
+error_symbol   = "[❱](bold coral)"
+vimcmd_symbol  = "[❰](bold sage)"
+vimcmd_visual_symbol = "[❰](bold mauve)"
+
+# --- GIT & JUJUTSU ---
+[git_branch]
+format = "[$branch]($style) "
+style = "muted_grey"
+
+[git_status]
+format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](coral)($ahead_behind$stashed )]($style)"
+style = "frost_teal"
+conflicted = "​"
+untracked = "​"
+modified = "​"
+staged = "​"
+renamed = "​"
+deleted = "​"
+stashed = "≡"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "amber"
+
+[jj_bookmark]
+format = "[$bookmark(@$remote)$diverged( \\(+$overflow_count others\\))]($style) "
+style = "muted_grey"
+
+[jj_status]
+format = "[[(*$all)](coral)]($style) "
+style = "frost_teal"
+conflicted = "​"
+description_empty = ""
+description_present = ""
+hidden = "​"
+immutable = "​"
+added = "​"
+copied = ""
+deleted = "​"
+modified = "​"
+renamed = "​"
+
+# --- SUBTLE LANGUAGE RUNTIMES ---
+[dotnet]
+symbol = "󰪮 "
+style = "mauve"
+format = "[$symbol($version )]($style)"
+heuristic = true
+
+[python]
+symbol = " "
+style = "frost_teal"
+format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+detect_extensions = ["py"]
+detect_files = ["pyproject.toml", "requirements.txt", ".python-version", "uv.lock"]
+
+[nodejs]
+symbol = " "
+style = "sage"
+format = "[$symbol($version )]($style)"
+detect_files = ["package.json", ".node-version"]
+detect_folders = ["node_modules"]
+
+[rust]
+symbol = "󱘗 "
+style = "coral"
+format = "[$symbol($version )]($style)"
+
+[golang]
+symbol = " "
+style = "steel_blue"
+format = "[$symbol($version )]($style)"
+
+[cmd_duration]
+format = "[󱦟 $duration]($style)"
+style = "amber"
