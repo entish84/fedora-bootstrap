@@ -36,19 +36,38 @@ class BootstrapLogger:
 
         # File Handler (if log_file directory is writable or mock)
         if self.log_file:
+            self.set_log_file(self.log_file)
+
+    def set_log_file(self, log_file: Path) -> Path:
+        """Configure or update the persistent log file handler with fallback for unprivileged runs."""
+        self.log_file = log_file
+        fh_formatter = logging.Formatter(
+            "[%(asctime)s] [%(levelname)s] %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
+        )
+        # Remove any existing FileHandlers
+        self._logger.handlers = [h for h in self._logger.handlers if not isinstance(h, logging.FileHandler)]
+
+        try:
+            self.log_file.parent.mkdir(parents=True, exist_ok=True)
+            fh = logging.FileHandler(str(self.log_file), encoding="utf-8")
+            fh.setLevel(logging.DEBUG)
+            fh.setFormatter(fh_formatter)
+            self._logger.addHandler(fh)
+            return self.log_file
+        except (PermissionError, OSError):
+            # Fallback if unprivileged (e.g. dry-run without sudo)
+            fallback = Path.home() / ".local" / "share" / "fedora-bootstrap" / "fedora_bootstrap.log"
             try:
-                self.log_file.parent.mkdir(parents=True, exist_ok=True)
-                fh = logging.FileHandler(str(self.log_file), encoding="utf-8")
+                fallback.parent.mkdir(parents=True, exist_ok=True)
+                fh = logging.FileHandler(str(fallback), encoding="utf-8")
                 fh.setLevel(logging.DEBUG)
-                fh_formatter = logging.Formatter(
-                    "[%(asctime)s] [%(levelname)s] %(message)s",
-                    datefmt="%Y-%m-%d %H:%M:%S"
-                )
                 fh.setFormatter(fh_formatter)
                 self._logger.addHandler(fh)
-            except (PermissionError, OSError):
-                # Ignore file write failures in unprivileged tests
-                pass
+                self.log_file = fallback
+                return fallback
+            except Exception:
+                return self.log_file
 
     def info(self, msg: str) -> None:
         self._logger.info(msg)

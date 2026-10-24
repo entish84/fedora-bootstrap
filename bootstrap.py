@@ -102,6 +102,12 @@ def parse_arguments() -> argparse.Namespace:
         default=Path("/var/lib/fedora-bootstrap/state.json"),
         help="Path to state tracking journal file",
     )
+    parser.add_argument(
+        "--log-file",
+        type=Path,
+        default=Path("/var/log/fedora_bootstrap.log"),
+        help="Path to persistent log file",
+    )
     return parser.parse_args()
 
 
@@ -189,6 +195,10 @@ def main() -> None:
     # Initialize execution context
     ctx = ExecutionContext.detect(dry_run=args.dry_run)
     ctx.state_file = args.state_file
+    if args.log_file:
+        ctx.log_file = args.log_file
+    actual_log = logger.set_log_file(ctx.log_file)
+    ctx.log_file = actual_log
     if args.profile:
         ctx.profile = args.profile
     if args.dotfiles:
@@ -220,6 +230,8 @@ def main() -> None:
         ("Developer TUIs", "lazygit, lazydocker, jj, uv, tealdeer" if ctx.install_dev_tools else "Skipped"),
         ("Dotfiles Source", dotfiles_desc),
         ("Wallpapers", "Catppuccin Minimalist Pack" if ctx.enable_wallpapers else "Skipped"),
+        ("Log File", str(ctx.log_file)),
+        ("State Journal", str(ctx.state_file)),
         ("Execution Mode", "DRY-RUN SIMULATION" if ctx.dry_run else "LIVE EXECUTION"),
     ]
     print_plan_summary(summary)
