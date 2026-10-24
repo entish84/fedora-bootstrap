@@ -85,8 +85,9 @@ def run_user(
 
     logger.debug(f"[EXEC USER ({ctx.target_user})] {cmd_str}")
 
-    # Build sudo -u user -H wrapper
-    user_cmd = ["sudo", "-u", ctx.target_user, "-H", "bash", "-c", cmd_str]
+    # Build sudo -u user -H wrapper ensuring user paths (~/.local/bin, ~/bin, /usr/local/bin) are on PATH
+    wrapped_cmd = f'export PATH="$HOME/.local/bin:$HOME/bin:/usr/local/bin:$PATH"; {cmd_str}'
+    user_cmd = ["sudo", "-u", ctx.target_user, "-H", "bash", "-c", wrapped_cmd]
 
     exec_env = os.environ.copy()
     exec_env["HOME"] = str(ctx.target_home)

@@ -27,8 +27,8 @@ class PackagesTask(BaseTask):
         return True
 
     def check(self, ctx: ExecutionContext) -> bool:
-        # Check a representative sample of modern tools
-        res = run_root("which eza bat fzf ripgrep zoxide yazi micro", ctx, check=False, capture=True)
+        # Check a representative sample of modern tools (note: binary for ripgrep is 'rg')
+        res = run_root("which eza bat fzf rg zoxide yazi micro", ctx, check=False, capture=True)
         return res.returncode == 0
 
     def apply(self, ctx: ExecutionContext) -> bool:

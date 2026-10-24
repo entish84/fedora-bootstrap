@@ -34,7 +34,11 @@ StartupWMClass=jetbrains-toolbox
             res = run_root("rpm -q code", ctx, check=False, capture=True)
             ok = ok and (res.returncode == 0)
         if "jetbrains_toolbox" in ctx.selected_ides:
-            ok = ok and Path("/opt/jetbrains-toolbox/jetbrains-toolbox").exists()
+            has_bin = (
+                Path("/opt/jetbrains-toolbox/bin/jetbrains-toolbox").exists()
+                or Path("/opt/jetbrains-toolbox/jetbrains-toolbox").exists()
+            )
+            ok = ok and has_bin
         return ok
 
     def apply(self, ctx: ExecutionContext) -> bool:
@@ -46,8 +50,11 @@ StartupWMClass=jetbrains-toolbox
         # 2. JetBrains Toolbox Native
         if "jetbrains_toolbox" in ctx.selected_ides:
             dest_dir = Path("/opt/jetbrains-toolbox")
-            bin_path = dest_dir / "jetbrains-toolbox"
-            if not bin_path.exists():
+            has_bin = (
+                (dest_dir / "bin" / "jetbrains-toolbox").exists()
+                or (dest_dir / "jetbrains-toolbox").exists()
+            )
+            if not has_bin:
                 logger.info("Fetching latest JetBrains Toolbox release information...")
                 dl_url = None
                 try:
@@ -66,18 +73,42 @@ StartupWMClass=jetbrains-toolbox
                     run_root(f"tar -xzf {tarball} -C '{dest_dir}' --strip-components=1", ctx, check=False)
                     run_root(f"rm -f {tarball}", ctx, check=False)
 
-                    # Extract/find icon or binary
-                    run_root("chmod -R 755 /opt/jetbrains-toolbox", ctx, check=False)
-                    run_root("ln -sfn /opt/jetbrains-toolbox/jetbrains-toolbox /usr/local/bin/jetbrains-toolbox", ctx, check=False)
+            # Resolve actual binary location (root vs bin/ subdirectory)
+            actual_bin = (
+                dest_dir / "bin" / "jetbrains-toolbox"
+                if (dest_dir / "bin" / "jetbrains-toolbox").exists()
+                else dest_dir / "jetbrains-toolbox"
+            )
+            # Resolve actual icon location
+            actual_icon = (
+                dest_dir / "bin" / "toolbox.svg"
+                if (dest_dir / "bin" / "toolbox.svg").exists()
+                else dest_dir / "toolbox.svg"
+            )
 
-                    # Create desktop shortcut
-                    if not ctx.dry_run:
-                        desktop_file = Path("/usr/share/applications/jetbrains-toolbox.desktop")
-                        desktop_file.write_text(self.TOOLBOX_DESKTOP, encoding="utf-8")
-                        desktop_file.chmod(0o644)
+            if actual_bin.exists() or ctx.dry_run:
+                run_root(f"chmod -R 755 '{dest_dir}'", ctx, check=False)
+                run_root(f"ln -sfn '{actual_bin}' /usr/local/bin/jetbrains-toolbox", ctx, check=False)
 
-                    # Restore SELinux context
-                    run_root("restorecon -R /opt/jetbrains-toolbox /usr/local/bin/jetbrains-toolbox /usr/share/applications/jetbrains-toolbox.desktop", ctx, check=False)
-                    run_root("update-desktop-database /usr/share/applications || true", ctx, check=False)
+                # Create desktop shortcut
+                if not ctx.dry_run:
+                    desktop_content = f"""[Desktop Entry]
+Version=1.0
+Type=Application
+Name=JetBrains Toolbox
+Icon={actual_icon}
+Exec="/usr/local/bin/jetbrains-toolbox" %f
+Comment=Manage JetBrains IDEs & Projects
+Categories=Development;IDE;
+Terminal=false
+StartupWMClass=jetbrains-toolbox
+"""
+                    desktop_file = Path("/usr/share/applications/jetbrains-toolbox.desktop")
+                    desktop_file.write_text(desktop_content, encoding="utf-8")
+                    desktop_file.chmod(0o644)
+
+                # Restore SELinux context
+                run_root("restorecon -R /opt/jetbrains-toolbox /usr/local/bin/jetbrains-toolbox /usr/share/applications/jetbrains-toolbox.desktop", ctx, check=False)
+                run_root("update-desktop-database /usr/share/applications || true", ctx, check=False)
 
         return True
