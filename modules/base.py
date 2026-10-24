@@ -54,13 +54,17 @@ class TaskRunner:
                 logger.step(f"[{idx}/{total}] {task.description}", status="SKIPPED")
                 continue
 
-            # Check if task was completed in state journal or checks pass
+            # Determine if task should be skipped:
+            # 1. If --force flag is passed: never skip!
+            # 2. If state.json was removed/missing (fresh run): never skip! Re-execute all tasks from start.
+            # 3. Otherwise: skip if task was completed in state journal or satisfies check()
             is_already_done = False
-            try:
-                if self.state.is_task_completed(task.name) or task.check(self.ctx):
-                    is_already_done = True
-            except Exception as e:
-                logger.debug(f"Check failed for {task.name}: {e}")
+            if not self.ctx.force and not self.state.is_new_state:
+                try:
+                    if self.state.is_task_completed(task.name) or task.check(self.ctx):
+                        is_already_done = True
+                except Exception as e:
+                    logger.debug(f"Check failed for {task.name}: {e}")
 
             if is_already_done:
                 logger.step(f"[{idx}/{total}] {task.description} (Already satisfied)", status="OK")

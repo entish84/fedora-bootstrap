@@ -38,6 +38,13 @@ class TestContextAndState(unittest.TestCase):
             # Reload tracker from file
             tracker2 = StateTracker(ctx)
             self.assertTrue(tracker2.is_task_completed("test_task"))
+            self.assertFalse(tracker2.is_new_state)
+
+            # Test removing state.json resets state to new
+            state_file.unlink()
+            tracker3 = StateTracker(ctx)
+            self.assertFalse(tracker3.is_task_completed("test_task"))
+            self.assertTrue(tracker3.is_new_state)
 
 
 if __name__ == "__main__":

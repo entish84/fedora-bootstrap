@@ -14,6 +14,7 @@ class StateTracker:
     def __init__(self, ctx: ExecutionContext):
         self.ctx = ctx
         self.state_file = ctx.state_file
+        self.is_new_state: bool = not self.state_file.exists()
         self.data: Dict[str, Any] = {
             "version": 1,
             "created_at": time.time(),

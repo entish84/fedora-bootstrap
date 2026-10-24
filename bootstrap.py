@@ -97,6 +97,12 @@ def parse_arguments() -> argparse.Namespace:
         help="Execute immediately using default or argument-provided selections",
     )
     parser.add_argument(
+        "--force",
+        "-f",
+        action="store_true",
+        help="Force re-execution of all tasks from start, ignoring existing state",
+    )
+    parser.add_argument(
         "--state-file",
         type=Path,
         default=Path("/var/lib/fedora-bootstrap/state.json"),
@@ -194,6 +200,7 @@ def main() -> None:
 
     # Initialize execution context
     ctx = ExecutionContext.detect(dry_run=args.dry_run)
+    ctx.force = args.force
     ctx.state_file = args.state_file
     if args.log_file:
         ctx.log_file = args.log_file

@@ -44,6 +44,7 @@ class ExecutionContext:
 
     # Script control flags
     dry_run: bool = False
+    force: bool = False
     non_interactive: bool = False
     state_file: Path = Path("/var/lib/fedora-bootstrap/state.json")
     log_file: Path = Path("/var/log/fedora_bootstrap.log")

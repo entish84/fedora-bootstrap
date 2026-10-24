@@ -21,8 +21,18 @@ class DesktopGnomeTask(BaseTask):
         return ctx.profile == "workstation"
 
     def check(self, ctx: ExecutionContext) -> bool:
+        # Verify papirus theme package is installed
         res = run_root("rpm -q papirus-icon-theme", ctx, check=False, capture=True)
-        return res.returncode == 0
+        if res.returncode != 0:
+            return False
+
+        # If productivity is enabled, verify Omakub shortcuts are in place
+        if ctx.enable_gnome_productivity:
+            sc_res = run_user("gsettings get org.gnome.desktop.wm.keybindings close", ctx, check=False, capture=True)
+            if "['<Super>w']" not in sc_res.stdout:
+                return False
+
+        return True
 
     def _apply_omakub_shortcuts(self, ctx: ExecutionContext) -> None:
         """Apply keyboard-driven workflow shortcuts inspired by Omakub."""
