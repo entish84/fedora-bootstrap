@@ -25,7 +25,7 @@ return {
 
   -- 2. Mason tool installer: ensure Omnisharp, CSharpier, and NetCoreDbg are ready
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
       vim.list_extend(opts.ensure_installed, {
@@ -107,7 +107,13 @@ return {
 
     def check(self, ctx: ExecutionContext) -> bool:
         dotnet_plugin = ctx.target_home / ".config" / "nvim" / "lua" / "plugins" / "dotnet.lua"
-        return dotnet_plugin.exists()
+        if not dotnet_plugin.exists():
+            return False
+        try:
+            content = dotnet_plugin.read_text(encoding="utf-8")
+            return "mason-org/mason.nvim" in content
+        except Exception:
+            return False
 
     def apply(self, ctx: ExecutionContext) -> bool:
         logger.info("Installing Neovim from Terra/Fedora...")
@@ -131,6 +137,6 @@ return {
             plugins_dir.mkdir(parents=True, exist_ok=True)
             dotnet_plugin.write_text(self.DOTNET_PLUGIN_LUA, encoding="utf-8")
 
-        # Fix ownership
-        run_user(f"chown -R {ctx.target_user}:{ctx.target_user} '{nvim_dir}'", ctx, check=False)
+        # Fix ownership to target user (run with root to handle any root-owned files)
+        run_root(f"chown -R {ctx.target_user}:{ctx.target_user} '{nvim_dir}'", ctx, check=False)
         return True
