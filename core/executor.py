@@ -85,9 +85,31 @@ def run_user(
 
     logger.debug(f"[EXEC USER ({ctx.target_user})] {cmd_str}")
 
-    # Build sudo -u user -H wrapper ensuring user paths (~/.local/bin, ~/bin, /usr/local/bin) are on PATH
-    wrapped_cmd = f'export PATH="$HOME/.local/bin:$HOME/bin:/usr/local/bin:$PATH"; {cmd_str}'
-    user_cmd = ["sudo", "-u", ctx.target_user, "-H", "bash", "-c", wrapped_cmd]
+    # Build user wrapper ensuring paths and systemd/D-Bus session bus are properly exported
+    wrapper_lines = [
+        'export PATH="$HOME/.local/bin:$HOME/bin:/usr/local/bin:$PATH"',
+        f'export USER="{ctx.target_user}"',
+        f'export HOME="{ctx.target_home}"',
+        f'if [ -d "/run/user/{ctx.target_uid}" ]; then export XDG_RUNTIME_DIR="/run/user/{ctx.target_uid}"; fi',
+        f'if [ -z "$DBUS_SESSION_BUS_ADDRESS" ] || [ ! -S "${{DBUS_SESSION_BUS_ADDRESS#unix:path=}}" ]; then',
+        f'    if [ -S "/run/user/{ctx.target_uid}/bus" ]; then',
+        f'        export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/{ctx.target_uid}/bus"',
+        '    fi',
+        'fi',
+        'if [ -z "$DBUS_SESSION_BUS_ADDRESS" ] || [ ! -S "${DBUS_SESSION_BUS_ADDRESS#unix:path=}" ]; then',
+        '    if command -v dbus-run-session >/dev/null 2>&1; then',
+        '        gsettings() { dbus-run-session -- command gsettings "$@"; }',
+        '        dconf() { dbus-run-session -- command dconf "$@"; }',
+        '    fi',
+        'fi',
+        cmd_str
+    ]
+    wrapped_cmd = "\n".join(wrapper_lines)
+
+    if os.getuid() == ctx.target_uid:
+        user_cmd = ["bash", "-c", wrapped_cmd]
+    else:
+        user_cmd = ["sudo", "-u", ctx.target_user, "-H", "bash", "-c", wrapped_cmd]
 
     exec_env = os.environ.copy()
     exec_env["HOME"] = str(ctx.target_home)

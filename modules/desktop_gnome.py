@@ -26,10 +26,19 @@ class DesktopGnomeTask(BaseTask):
         if res.returncode != 0:
             return False
 
-        # If productivity is enabled, verify Omakub shortcuts are in place
+        # Verify icon theme setting in GSettings
+        theme_res = run_user("gsettings get org.gnome.desktop.interface icon-theme", ctx, check=False, capture=True)
+        if "'Papirus'" not in theme_res.stdout:
+            return False
+
+        # If productivity is enabled, verify Omakub shortcuts and workspace count
         if ctx.enable_gnome_productivity:
             sc_res = run_user("gsettings get org.gnome.desktop.wm.keybindings close", ctx, check=False, capture=True)
             if "['<Super>w']" not in sc_res.stdout:
+                return False
+
+            ws_res = run_user("gsettings get org.gnome.desktop.wm.preferences num-workspaces", ctx, check=False, capture=True)
+            if "6" not in ws_res.stdout:
                 return False
 
         return True

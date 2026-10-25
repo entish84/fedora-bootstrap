@@ -18,7 +18,13 @@ class WallpapersTask(BaseTask):
 
     def check(self, ctx: ExecutionContext) -> bool:
         wallpapers_dir = ctx.target_home / "Pictures" / "Wallpapers"
-        return wallpapers_dir.exists() and any(wallpapers_dir.iterdir())
+        if not (wallpapers_dir.exists() and any(wallpapers_dir.iterdir())):
+            return False
+        if ctx.profile == "workstation":
+            res = run_user("gsettings get org.gnome.desktop.background picture-uri", ctx, check=False, capture=True)
+            if "catppuccin" not in res.stdout:
+                return False
+        return True
 
     def apply(self, ctx: ExecutionContext) -> bool:
         target_dir = ctx.target_home / ".local" / "share" / "backgrounds" / "catppuccin"
