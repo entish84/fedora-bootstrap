@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import urllib.request
 from core.context import ExecutionContext
-from core.executor import run_root
+from core.executor import run_root, run_user
 from core.logger import logger
 from modules.base import BaseTask
 
@@ -148,6 +148,7 @@ StartupWMClass=jetbrains-toolbox
                     user_desktop = user_desktop_dir / "jetbrains-toolbox.desktop"
                     user_desktop.write_text(desktop_content.replace("/usr/local/bin/jetbrains-toolbox", str(actual_bin)), encoding="utf-8")
                     user_desktop.chmod(0o644)
+                    run_root(f"chown {ctx.target_user}:{ctx.target_user} '{user_desktop}'", ctx, check=False)
 
                 # Update icon caches & desktop databases
                 run_root("gtk-update-icon-cache -f -t /usr/share/icons/hicolor || true", ctx, check=False)

@@ -4,7 +4,7 @@ from pathlib import Path
 import shutil
 import time
 from core.context import ExecutionContext
-from core.executor import run_user
+from core.executor import run_root, run_user
 from core.logger import logger
 from modules.base import BaseTask
 
@@ -78,5 +78,7 @@ class DotfilesTask(BaseTask):
                 dest_path.symlink_to(src_file)
 
         # 4. Fix permissions
-        run_user(f"chown -R {ctx.target_user}:{ctx.target_user} '{dotfiles_dir}'", ctx, check=False)
+        run_root(f"chown -R {ctx.target_user}:{ctx.target_user} '{dotfiles_dir}'", ctx, check=False)
+        if backup_dir.exists():
+            run_root(f"chown -R {ctx.target_user}:{ctx.target_user} '{backup_dir}'", ctx, check=False)
         return True
