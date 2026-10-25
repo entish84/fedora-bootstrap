@@ -34,6 +34,7 @@ class ExecutionContext:
 
     # Software & IDE selection
     selected_ides: List[str] = field(default_factory=lambda: ["jetbrains_toolbox", "vscode", "neovim"])
+    selected_apps: List[str] = field(default_factory=lambda: ["antigravity", "zen", "zed", "localsend", "ollama"])
     install_docker: bool = True
     install_podman: bool = True
     install_dev_tools: bool = True

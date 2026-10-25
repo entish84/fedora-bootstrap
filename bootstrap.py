@@ -43,6 +43,7 @@ from modules.virtualization import VirtualizationTask
 from modules.shell_env import ShellEnvTask
 from modules.neovim_dotnet import NeovimDotnetTask
 from modules.ides import IdesTask
+from modules.optional_apps import OptionalAppsTask
 from modules.dotfiles import DotfilesTask
 from modules.git_onboard import GitOnboardTask
 from modules.system_tuning import SystemTuningTask
@@ -85,6 +86,16 @@ def parse_arguments() -> argparse.Namespace:
         "--with-nvidia",
         action="store_true",
         help="Install NVIDIA proprietary drivers (akmod-nvidia and CUDA)",
+    )
+    parser.add_argument(
+        "--apps",
+        type=str,
+        help="Comma-separated optional applications (antigravity,zen,zed,localsend,ollama,libreoffice,waydroid,github_desktop,bruno,vesktop,obsidian) or 'all'/'none'",
+    )
+    parser.add_argument(
+        "--no-apps",
+        action="store_true",
+        help="Skip all optional applications",
     )
     parser.add_argument(
         "--dry-run",
@@ -166,7 +177,26 @@ def run_wizard(ctx: ExecutionContext) -> None:
         ide_options,
     )
 
-    # 6. Developer TUI Suite
+    # 6. Optional Modern Applications
+    app_options = [
+        ("antigravity", "Antigravity CLI (Official Google AI agent CLI)", True),
+        ("zen", "Zen Browser (Calm, fast Firefox-based browser with vertical tabs)", True),
+        ("zed", "Zed Editor (High-performance multiplayer Rust code editor with Ollama AI)", True),
+        ("localsend", "LocalSend (Cross-platform AirDrop alternative for local network sharing)", True),
+        ("ollama", "Ollama (Local AI LLM engine with systemd service)", True),
+        ("libreoffice", "LibreOffice Suite (Full productivity suite with GTK4 theming)", False),
+        ("waydroid", "Android APK Runtime (Waydroid LXC container + Scrcpy screen control)", False),
+        ("github_desktop", "GitHub Desktop (Native RPM GUI client for Git/GitHub)", False),
+        ("bruno", "Bruno (Lightweight, Git-friendly Postman alternative)", False),
+        ("vesktop", "Vesktop (Snappy Discord client with screen-share audio)", False),
+        ("obsidian", "Obsidian (Markdown knowledge base & note-taking via Flathub)", False),
+    ]
+    ctx.selected_apps = prompt_checkboxes(
+        "Select optional desktop & productivity applications to install:",
+        app_options,
+    )
+
+    # 7. Developer TUI Suite
     ctx.install_dev_tools = prompt_yes_no(
         "Install Developer TUI Tools (lazygit, lazydocker, jujutsu, uv, tealdeer, duf, procs)?",
         default=True,
@@ -215,6 +245,15 @@ def main() -> None:
         ctx.enable_dms_niri = True
     if args.with_nvidia:
         ctx.enable_nvidia = True
+    if args.no_apps:
+        ctx.selected_apps = []
+    elif args.apps:
+        if args.apps.lower() == "all":
+            ctx.selected_apps = ["antigravity", "zen", "zed", "localsend", "ollama", "libreoffice", "waydroid", "github_desktop", "bruno", "vesktop", "obsidian"]
+        elif args.apps.lower() in ("none", "empty"):
+            ctx.selected_apps = []
+        else:
+            ctx.selected_apps = [a.strip() for a in args.apps.split(",") if a.strip()]
 
     # Run interactive wizard if not non-interactive
     if not args.non_interactive:
@@ -234,6 +273,7 @@ def main() -> None:
         ("NVIDIA Drivers", "Enabled" if ctx.enable_nvidia else "Disabled"),
         ("Wayland Compositor", "DankLinux Shell + Niri" if ctx.enable_dms_niri else "Default GNOME / TTY"),
         ("Selected IDEs", ", ".join(ctx.selected_ides) if ctx.selected_ides else "None"),
+        ("Optional Apps", ", ".join(ctx.selected_apps) if ctx.selected_apps else "None"),
         ("Developer TUIs", "lazygit, lazydocker, jj, uv, tealdeer" if ctx.install_dev_tools else "Skipped"),
         ("Dotfiles Source", dotfiles_desc),
         ("Wallpapers", "Catppuccin Minimalist Pack" if ctx.enable_wallpapers else "Skipped"),
@@ -269,6 +309,7 @@ def main() -> None:
     runner.register(ShellEnvTask())
     runner.register(NeovimDotnetTask())
     runner.register(IdesTask())
+    runner.register(OptionalAppsTask())
     runner.register(DotfilesTask())
     runner.register(GitOnboardTask())
     runner.register(SystemTuningTask())

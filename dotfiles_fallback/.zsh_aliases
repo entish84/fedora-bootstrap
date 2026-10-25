@@ -113,3 +113,53 @@ alias mem="free -h"
 alias disk="df -h"
 alias sysinfo="fastfetch"
 alias myip="curl -s https://ipinfo.io/json | jq"
+
+# =============================================================================
+# Fedora Bootstrap Tooling
+# =============================================================================
+alias fb="sudo /home/rs/fedora-bootstrap/bootstrap.py"
+alias fb-dry="python3 /home/rs/fedora-bootstrap/bootstrap.py --dry-run"
+alias fb-status="cat /var/lib/fedora-bootstrap/state.json 2>/dev/null | jq ."
+alias fb-reset="sudo rm -f /var/lib/fedora-bootstrap/state.json && echo 'Bootstrap state reset.'"
+alias fb-log="sudo tail -f /var/log/fedora_bootstrap.log"
+
+# =============================================================================
+# AI & Local LLM Tooling (Antigravity & Ollama)
+# =============================================================================
+alias agy="agy"
+alias ol="ollama"
+alias olr="ollama run qwen2.5-coder:7b"
+alias olls="ollama list"
+alias olps="ollama ps"
+alias olrm="ollama rm"
+
+# =============================================================================
+# Android on Linux (Waydroid & Scrcpy)
+# =============================================================================
+alias wd="waydroid"
+alias wd-start="waydroid session start"
+alias wd-stop="waydroid session stop"
+alias wd-show="waydroid show-full-ui"
+alias wd-in="waydroid app install"
+alias scp="scrcpy"
+alias scp-wifi="scrcpy --tcpip"
+
+# =============================================================================
+# Modern Editors & Desktop Applications
+# =============================================================================
+alias v="nvim"
+alias z="zed"
+alias tb="jetbrains-toolbox"
+alias zen="zen-browser"
+alias lsend="localsend"
+alias ghd="github-desktop"
+alias bruno="bruno"
+
+# =============================================================================
+# System Navigation & Modern CLI
+# =============================================================================
+alias top="btop"
+alias y="yazi"
+alias du="dust"
+alias df="duf"
+alias psg="procs"

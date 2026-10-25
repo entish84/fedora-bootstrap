@@ -25,6 +25,7 @@ from modules.virtualization import VirtualizationTask
 from modules.shell_env import ShellEnvTask
 from modules.neovim_dotnet import NeovimDotnetTask
 from modules.ides import IdesTask
+from modules.optional_apps import OptionalAppsTask
 from modules.dotfiles import DotfilesTask
 from modules.git_onboard import GitOnboardTask
 from modules.system_tuning import SystemTuningTask
@@ -57,6 +58,7 @@ class TestDryRunPipeline(unittest.TestCase):
         runner.register(ShellEnvTask())
         runner.register(NeovimDotnetTask())
         runner.register(IdesTask())
+        runner.register(OptionalAppsTask())
         runner.register(DotfilesTask())
         runner.register(GitOnboardTask())
         runner.register(SystemTuningTask())
@@ -66,13 +68,13 @@ class TestDryRunPipeline(unittest.TestCase):
 
     def test_workstation_dry_run_pipeline(self):
         runner = self._create_runner(profile="workstation", enable_dms_niri=False)
-        self.assertEqual(len(runner.tasks), 17)
+        self.assertEqual(len(runner.tasks), 18)
         success = runner.run_all()
         self.assertTrue(success, "Workstation dry-run pipeline should complete successfully")
 
     def test_minimal_dry_run_pipeline(self):
         runner = self._create_runner(profile="minimal", enable_dms_niri=True)
-        self.assertEqual(len(runner.tasks), 17)
+        self.assertEqual(len(runner.tasks), 18)
         success = runner.run_all()
         self.assertTrue(success, "Minimal with Niri dry-run pipeline should complete successfully")
 

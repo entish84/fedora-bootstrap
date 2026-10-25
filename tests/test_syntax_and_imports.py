@@ -45,6 +45,7 @@ class TestSyntaxAndImports(unittest.TestCase):
             "modules.shell_env",
             "modules.neovim_dotnet",
             "modules.ides",
+            "modules.optional_apps",
             "modules.dotfiles",
             "modules.git_onboard",
             "modules.system_tuning",
@@ -63,7 +64,7 @@ class TestSyntaxAndImports(unittest.TestCase):
         import builtins
 
         builtins_set = set(dir(builtins))
-        excluded_names = {'__file__', 'c', 'h', 'key', 'checked', 'label', 'p', 'k', 'v', 'ide'}
+        excluded_names = {'__file__', 'c', 'h', 'key', 'checked', 'label', 'p', 'k', 'v', 'ide', 'a'}
 
         for py_file in PROJECT_ROOT.glob("**/*.py"):
             if ".git" in py_file.parts or ".pytest_cache" in py_file.parts or "tests" in py_file.parts:
@@ -116,6 +117,11 @@ class TestSyntaxAndImports(unittest.TestCase):
                             for elt in target.elts:
                                 if isinstance(elt, ast.Name):
                                     self.scopes[-1].add(elt.id)
+                    self.generic_visit(node)
+
+                def visit_AnnAssign(self, node):
+                    if isinstance(node.target, ast.Name):
+                        self.scopes[-1].add(node.target.id)
                     self.generic_visit(node)
 
                 def visit_For(self, node):
