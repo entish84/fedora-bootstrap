@@ -26,12 +26,11 @@ def run_root(
     cmd: Union[str, List[str]],
     ctx: ExecutionContext,
     check: bool = True,
-    capture: bool = False,
+    capture: bool = True,
     env: Optional[dict] = None
 ) -> ExecutionResult:
     """Execute a system-level command with root privileges."""
     cmd_str = cmd if isinstance(cmd, str) else " ".join(shlex.quote(c) for c in cmd)
-    cmd_list = shlex.split(cmd) if isinstance(cmd, str) else cmd
 
     if ctx.dry_run:
         logger.debug(f"[DRY-RUN ROOT] {cmd_str}")
@@ -39,24 +38,41 @@ def run_root(
 
     logger.debug(f"[EXEC ROOT] {cmd_str}")
 
+    sys.stdout.flush()
+    sys.stderr.flush()
+
     exec_env = os.environ.copy()
     if env:
         exec_env.update(env)
 
+    root_cmd = ["bash", "-c", cmd_str]
+
     try:
         proc = subprocess.run(
-            cmd_list,
+            root_cmd,
             check=check,
             capture_output=capture,
             text=True,
             env=exec_env
         )
+        sys.stdout.flush()
+        sys.stderr.flush()
+        if capture and proc.stdout:
+            for line in proc.stdout.splitlines():
+                if line.strip():
+                    logger.debug(f"[ROOT STDOUT] {line}")
+        if capture and proc.stderr:
+            for line in proc.stderr.splitlines():
+                if line.strip():
+                    logger.debug(f"[ROOT STDERR] {line}")
         return ExecutionResult(
             returncode=proc.returncode,
             stdout=proc.stdout or "",
             stderr=proc.stderr or ""
         )
     except subprocess.CalledProcessError as e:
+        sys.stdout.flush()
+        sys.stderr.flush()
         logger.error(f"Root command failed (code {e.returncode}): {cmd_str}")
         if capture and e.stderr:
             logger.error(f"STDERR: {e.stderr.strip()}")
@@ -73,7 +89,7 @@ def run_user(
     cmd: Union[str, List[str]],
     ctx: ExecutionContext,
     check: bool = True,
-    capture: bool = False,
+    capture: bool = True,
     env: Optional[dict] = None
 ) -> ExecutionResult:
     """Execute a command as the target unprivileged user (preventing root pollution in $HOME)."""
@@ -84,6 +100,9 @@ def run_user(
         return ExecutionResult(returncode=0, stdout="[dry-run output]")
 
     logger.debug(f"[EXEC USER ({ctx.target_user})] {cmd_str}")
+
+    sys.stdout.flush()
+    sys.stderr.flush()
 
     # Build user wrapper ensuring paths and systemd/D-Bus session bus are properly exported
     wrapper_lines = [
@@ -126,12 +145,24 @@ def run_user(
             text=True,
             env=exec_env
         )
+        sys.stdout.flush()
+        sys.stderr.flush()
+        if capture and proc.stdout:
+            for line in proc.stdout.splitlines():
+                if line.strip():
+                    logger.debug(f"[USER STDOUT] {line}")
+        if capture and proc.stderr:
+            for line in proc.stderr.splitlines():
+                if line.strip():
+                    logger.debug(f"[USER STDERR] {line}")
         return ExecutionResult(
             returncode=proc.returncode,
             stdout=proc.stdout or "",
             stderr=proc.stderr or ""
         )
     except subprocess.CalledProcessError as e:
+        sys.stdout.flush()
+        sys.stderr.flush()
         logger.error(f"User command failed for {ctx.target_user} (code {e.returncode}): {cmd_str}")
         if capture and e.stderr:
             logger.error(f"STDERR: {e.stderr.strip()}")

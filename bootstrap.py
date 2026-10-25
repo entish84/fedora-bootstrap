@@ -245,6 +245,8 @@ def main() -> None:
 
     if not args.non_interactive:
         proceed = prompt_yes_no("Proceed with pipeline execution?", default=True)
+        print()
+        sys.stdout.flush()
         if not proceed:
             print(f"{ANSIColors.YELLOW}Execution aborted by user.{ANSIColors.RESET}")
             sys.exit(0)
@@ -280,7 +282,7 @@ def main() -> None:
         print("                 BOOTSTRAP COMPLETED SUCCESSFULLY!")
         print(f"================================================================================{ANSIColors.RESET}\n")
 
-        if not ctx.dry_run:
+        if not ctx.dry_run and not args.non_interactive:
             reboot_now = prompt_yes_no("It is recommended to reboot your system. Reboot now?", default=False)
             if reboot_now:
                 logger.info("Initiating system reboot...")

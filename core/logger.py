@@ -71,19 +71,19 @@ class BootstrapLogger:
 
     def info(self, msg: str) -> None:
         self._logger.info(msg)
-        print(f"{ANSIColors.CYAN}ℹ{ANSIColors.RESET} {msg}")
+        print(f"{ANSIColors.CYAN}ℹ{ANSIColors.RESET} {msg}", flush=True)
 
     def success(self, msg: str) -> None:
         self._logger.info(f"SUCCESS: {msg}")
-        print(f"{ANSIColors.GREEN}✔{ANSIColors.RESET} {msg}")
+        print(f"{ANSIColors.GREEN}✔{ANSIColors.RESET} {msg}", flush=True)
 
     def warning(self, msg: str) -> None:
         self._logger.warning(msg)
-        print(f"{ANSIColors.YELLOW}⚠{ANSIColors.RESET} {msg}")
+        print(f"{ANSIColors.YELLOW}⚠{ANSIColors.RESET} {msg}", flush=True)
 
     def error(self, msg: str) -> None:
         self._logger.error(msg)
-        print(f"{ANSIColors.RED}✖ {msg}{ANSIColors.RESET}", file=sys.stderr)
+        print(f"{ANSIColors.RED}✖ {msg}{ANSIColors.RESET}", file=sys.stderr, flush=True)
 
     def step(self, name: str, status: str = "RUNNING") -> None:
         badge = f"{ANSIColors.BOLD}[ {status} ]{ANSIColors.RESET}"
@@ -98,7 +98,7 @@ class BootstrapLogger:
         elif status == "FAILED":
             badge = f"{ANSIColors.RED}{ANSIColors.BOLD}[ FAIL ]{ANSIColors.RESET}"
 
-        print(f"{badge} {name}")
+        print(f"{badge} {name}", flush=True)
         self._logger.info(f"[{status}] {name}")
 
     def debug(self, msg: str) -> None:
