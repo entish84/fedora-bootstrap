@@ -19,7 +19,7 @@ class NvidiaTask(BaseTask):
 
     def apply(self, ctx: ExecutionContext) -> bool:
         logger.info("Installing NVIDIA drivers from RPM Fusion Nonfree...")
-        run_root("dnf install -y akmod-nvidia xorg-x11-drv-nvidia-cuda", ctx, check=True)
+        run_root("dnf install -y akmod-nvidia xorg-x11-drv-nvidia-cuda", ctx, check=True, capture=False)
         logger.info("Compiling kernel modules via akmods...")
-        run_root("akmods --force", ctx, check=False)
+        run_root("akmods --force", ctx, check=False, capture=False)
         return True

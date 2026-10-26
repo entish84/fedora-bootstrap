@@ -38,8 +38,9 @@ class OptionalAppsTask(BaseTask):
                 if not agy_bin.exists() and not shutil.which("agy"):
                     return False
             elif app == "github_desktop":
-                res = run_root("rpm -q github-desktop", ctx, check=False, capture=True)
-                if res.returncode != 0:
+                res_rpm = run_root("rpm -q github-desktop", ctx, check=False, capture=True)
+                res_flatpak = run_user("flatpak info io.github.shiftey.Desktop", ctx, check=False, capture=True)
+                if res_rpm.returncode != 0 and res_flatpak.returncode != 0:
                     return False
             elif app == "obsidian":
                 res = run_user("flatpak info md.obsidian.Obsidian", ctx, check=False, capture=True)
@@ -109,40 +110,45 @@ class OptionalAppsTask(BaseTask):
                 rpm_pkgs.extend(self.APP_PACKAGES[app])
 
         if rpm_pkgs:
-            logger.info(f"Installing selected native RPM applications: {' '.join(rpm_pkgs)}...")
-            run_root(f"dnf install -y --skip-unavailable {' '.join(rpm_pkgs)}", ctx, check=False)
+            logger.info(f"Downloading and installing selected native RPM applications: {' '.join(rpm_pkgs)}...")
+            run_root(f"dnf install -y --skip-unavailable {' '.join(rpm_pkgs)}", ctx, check=False, capture=False)
 
         # 2. Antigravity CLI via official script
         if "antigravity" in ctx.selected_apps:
             agy_bin = ctx.target_home / ".local" / "bin" / "agy"
             if not agy_bin.exists():
                 logger.info("Installing Antigravity CLI (agy) via official Google installer...")
-                run_user("curl -fsSL https://antigravity.google/cli/install.sh | bash", ctx, check=False)
+                run_user("curl -fsSL https://antigravity.google/cli/install.sh | bash", ctx, check=False, capture=False)
 
             if agy_bin.exists() or ctx.dry_run:
                 run_root(f"ln -sfn '{agy_bin}' /usr/local/bin/agy", ctx, check=False)
 
-        # 3. GitHub Desktop via ShiftKey RPM repository
+        # 3. GitHub Desktop via Flathub (with fallback to direct GitHub release RPM)
         if "github_desktop" in ctx.selected_apps:
-            shiftkey_repo = Path("/etc/yum.repos.d/shiftkey-packages.repo")
-            if not shiftkey_repo.exists() and not ctx.dry_run:
-                logger.info("Adding ShiftKey RPM repository for GitHub Desktop...")
-                run_root("rpm --import https://rpm.packages.shiftkey.dev/gpg.key", ctx, check=False)
-                repo_content = """[shiftkey-packages]
-name=GitHub Desktop
-baseurl=https://rpm.packages.shiftkey.dev/rpm/
-enabled=1
-gpgcheck=1
-repo_gpgcheck=1
-gpgkey=https://rpm.packages.shiftkey.dev/gpg.key
-"""
-                shiftkey_repo.write_text(repo_content, encoding="utf-8")
-            run_root("dnf install -y github-desktop", ctx, check=False)
+            res_rpm = run_root("rpm -q github-desktop", ctx, check=False, capture=True)
+            res_flatpak = run_user("flatpak info io.github.shiftey.Desktop", ctx, check=False, capture=True)
+            if res_rpm.returncode != 0 and res_flatpak.returncode != 0:
+                logger.info("Installing GitHub Desktop from Flathub...")
+                res = run_user("flatpak install -y flathub io.github.shiftey.Desktop", ctx, check=False, capture=False)
+                if res.returncode != 0:
+                    logger.info("Flathub install failed; falling back to official GitHub release RPM...")
+                    rpm_url = "https://github.com/shiftkey/desktop/releases/download/release-3.4.13-linux1/GitHubDesktop-linux-x86_64-3.4.13-linux1.rpm"
+                    run_root(f"dnf install -y '{rpm_url}'", ctx, check=False, capture=False)
+
+            # Ensure CLI executable /usr/local/bin/github-desktop exists for terminal/alias access
+            if not shutil.which("github-desktop") and not ctx.dry_run:
+                run_root(
+                    "printf '#!/bin/bash\\nexec flatpak run io.github.shiftey.Desktop \"$@\"\\n' > /usr/local/bin/github-desktop && chmod 755 /usr/local/bin/github-desktop",
+                    ctx,
+                    check=False
+                )
 
         # 4. Obsidian via Flatpak
         if "obsidian" in ctx.selected_apps:
-            logger.info("Installing Obsidian from Flathub...")
-            run_user("flatpak install -y flathub md.obsidian.Obsidian", ctx, check=False)
+            res_obs = run_user("flatpak info md.obsidian.Obsidian", ctx, check=False, capture=True)
+            if res_obs.returncode != 0:
+                logger.info("Installing Obsidian from Flathub...")
+                run_user("flatpak install -y flathub md.obsidian.Obsidian", ctx, check=False, capture=False)
 
         # 5. Service Configuration: Ollama
         if "ollama" in ctx.selected_apps:

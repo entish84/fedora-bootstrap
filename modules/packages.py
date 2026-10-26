@@ -33,11 +33,11 @@ class PackagesTask(BaseTask):
 
     def apply(self, ctx: ExecutionContext) -> bool:
         logger.info("Performing system upgrade and installing core packages...")
-        run_root("dnf upgrade --refresh -y", ctx, check=False)
+        run_root("dnf upgrade --refresh -y", ctx, check=False, capture=False)
 
         pkg_str = " ".join(self.CORE_PACKAGES)
         logger.info(f"Installing {len(self.CORE_PACKAGES)} core packages & fonts...")
-        run_root(f"dnf install -y --skip-unavailable {pkg_str}", ctx, check=False)
+        run_root(f"dnf install -y --skip-unavailable {pkg_str}", ctx, check=False, capture=False)
 
         # Refresh font cache
         run_root("fc-cache -f", ctx, check=False)

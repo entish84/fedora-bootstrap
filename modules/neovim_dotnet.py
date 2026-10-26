@@ -117,7 +117,7 @@ return {
 
     def apply(self, ctx: ExecutionContext) -> bool:
         logger.info("Installing Neovim from Terra/Fedora...")
-        run_root("dnf install -y neovim", ctx, check=False)
+        run_root("dnf install -y neovim", ctx, check=False, capture=False)
 
         nvim_dir = ctx.target_home / ".config" / "nvim"
         lazy_lua = nvim_dir / "lua" / "config" / "lazy.lua"
@@ -126,7 +126,7 @@ return {
         if not lazy_lua.exists():
             logger.info("Cloning LazyVim starter template...")
             cmd = f"git clone https://github.com/LazyVim/starter '{nvim_dir}' || true"
-            run_user(cmd, ctx, check=False)
+            run_user(cmd, ctx, check=False, capture=False)
             run_user(f"rm -rf '{nvim_dir}/.git'", ctx, check=False)
 
         # Write .NET 10 plugin configuration

@@ -90,7 +90,7 @@ class DesktopGnomeTask(BaseTask):
 
     def apply(self, ctx: ExecutionContext) -> bool:
         logger.info("Installing Papirus icon theme...")
-        run_root("dnf install -y papirus-icon-theme", ctx, check=False)
+        run_root("dnf install -y papirus-icon-theme", ctx, check=False, capture=False)
 
         # Set Papirus icon theme for target user
         run_user("gsettings set org.gnome.desktop.interface icon-theme 'Papirus'", ctx, check=False)
@@ -98,7 +98,7 @@ class DesktopGnomeTask(BaseTask):
         if ctx.enable_gnome_productivity:
             logger.info("Installing GNOME productivity extensions...")
             ext_str = " ".join(self.EXTENSIONS)
-            run_root(f"dnf install -y --skip-unavailable {ext_str}", ctx, check=False)
+            run_root(f"dnf install -y --skip-unavailable {ext_str}", ctx, check=False, capture=False)
 
             logger.info("Applying GNOME productivity GSettings tweaks...")
             # 1. Add minimize/maximize buttons

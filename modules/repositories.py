@@ -70,8 +70,8 @@ skip_if_unavailable=True
             check=False
         )
 
-        # 3. Flathub (for Workstation or if enabled)
-        if ctx.profile == "workstation":
+        # 3. Flathub (for Workstation or if Flatpak apps are selected)
+        if ctx.profile == "workstation" or any(a in ctx.selected_apps for a in ("obsidian", "github_desktop")):
             logger.info("Configuring Flathub...")
             run_root("dnf install -y flatpak", ctx, check=False)
             run_root("flatpak remote-delete fedora --force", ctx, check=False)

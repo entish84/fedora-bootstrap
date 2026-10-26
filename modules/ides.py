@@ -71,7 +71,7 @@ StartupWMClass=jetbrains-toolbox
         # 1. Native VS Code RPM
         if "vscode" in ctx.selected_ides:
             logger.info("Installing Visual Studio Code via native RPM from Microsoft repository...")
-            run_root("dnf install -y code", ctx, check=False)
+            run_root("dnf install -y code", ctx, check=False, capture=False)
 
         # 2. JetBrains Toolbox Native
         if "jetbrains_toolbox" in ctx.selected_ides:

@@ -32,7 +32,7 @@ class WallpapersTask(BaseTask):
 
         logger.info(f"Cloning minimal wallpapers repository into {target_dir}...")
         cmd = f"git clone --depth 1 {self.REPO_URL} '{target_dir}' || true"
-        run_user(cmd, ctx, check=False)
+        run_user(cmd, ctx, check=False, capture=False)
 
         # Create symlink ~/Pictures/Wallpapers
         symlink_cmd = f"mkdir -p '{pictures_symlink.parent}' && ln -sfn '{target_dir}' '{pictures_symlink}'"

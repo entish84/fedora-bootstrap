@@ -30,11 +30,11 @@ class ShellEnvTask(BaseTask):
         if not zinit_dir.exists():
             logger.info("Pre-cloning Zinit plugin manager...")
             cmd = f"mkdir -p '{zinit_dir.parent}' && git clone https://github.com/zdharma-continuum/zinit.git '{zinit_dir}' || true"
-            run_user(cmd, ctx, check=False)
+            run_user(cmd, ctx, check=False, capture=False)
 
         # 3. Setup Mise global runtimes (.NET 10, Node LTS, Java LTS)
         logger.info("Configuring Mise polyglot runtime manager (.NET 10, Node LTS, Java LTS)...")
-        run_root("dnf install -y mise", ctx, check=False)
+        run_root("dnf install -y mise", ctx, check=False, capture=False)
 
         run_user("mise settings set idiomatic_version_file false 2>/dev/null || true", ctx, check=False)
         run_user("mise settings set yes true 2>/dev/null || true", ctx, check=False)

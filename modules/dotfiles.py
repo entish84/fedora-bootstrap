@@ -32,7 +32,7 @@ class DotfilesTask(BaseTask):
                 repo_url = f"https://github.com/{repo_url}.git"
             logger.info(f"Cloning user dotfiles from GitHub ({repo_url})...")
             cmd = f"rm -rf '{dotfiles_dir}' && git clone '{repo_url}' '{dotfiles_dir}'"
-            run_user(cmd, ctx, check=False)
+            run_user(cmd, ctx, check=False, capture=False)
         else:
             logger.info("Using bundled Charcoal-Amber fallback dotfiles suite...")
             fallback_source = ctx.project_dir / "dotfiles_fallback"

@@ -33,11 +33,11 @@ class DesktopDmsNiriTask(BaseTask):
 
     def apply(self, ctx: ExecutionContext) -> bool:
         logger.info("Enabling DMS Copr repository...")
-        run_root("dnf copr enable -y avengemedia/dms-git", ctx, check=False)
+        run_root("dnf copr enable -y avengemedia/dms-git", ctx, check=False, capture=False)
 
         pkg_str = " ".join(self.PACKAGES)
         logger.info(f"Installing Niri, DankMaterialShell, and Wayland utilities: {pkg_str}...")
-        run_root(f"dnf install -y --skip-unavailable {pkg_str}", ctx, check=False)
+        run_root(f"dnf install -y --skip-unavailable {pkg_str}", ctx, check=False, capture=False)
 
         # Create user config directories
         niri_dir = ctx.target_home / ".config" / "niri"

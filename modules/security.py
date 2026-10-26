@@ -21,7 +21,7 @@ class SecurityTask(BaseTask):
     def apply(self, ctx: ExecutionContext) -> bool:
         # 1. Enable OpenSSH server
         logger.info("Enabling and starting OpenSSH server daemon...")
-        run_root("dnf install -y openssh-server", ctx, check=False)
+        run_root("dnf install -y openssh-server", ctx, check=False, capture=False)
         run_root("systemctl enable --now sshd", ctx, check=False)
 
         # 2. Generate ed25519 keypair for user

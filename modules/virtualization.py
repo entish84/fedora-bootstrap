@@ -24,11 +24,12 @@ class VirtualizationTask(BaseTask):
             res = run_root(
                 "dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin",
                 ctx,
-                check=False
+                check=False,
+                capture=False
             )
             if not res.success:
                 logger.warning("Docker CE install failed, falling back to moby-engine...")
-                run_root("dnf install -y moby-engine docker-compose", ctx, check=False)
+                run_root("dnf install -y moby-engine docker-compose", ctx, check=False, capture=False)
 
             # Enable and start services
             run_root("systemctl enable --now docker", ctx, check=False)
@@ -37,7 +38,7 @@ class VirtualizationTask(BaseTask):
         # 2. Install Podman
         if ctx.install_podman:
             logger.info("Installing Podman...")
-            run_root("dnf install -y podman", ctx, check=False)
+            run_root("dnf install -y podman", ctx, check=False, capture=False)
 
         # 3. User Group Permissions (docker & kvm)
         logger.info(f"Adding user '{ctx.target_user}' to docker and kvm groups...")
