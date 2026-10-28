@@ -150,7 +150,7 @@ fi
 
 # 3. Zoxide (Smart directory jumper)
 if command -v zoxide >/dev/null 2>&1; then
-    eval "$(zoxide init zsh)"
+    eval "$(zoxide init zsh --cmd cd)"
 fi
 
 # 4. FZF native keybindings (Ctrl+T for files, Alt+C for dirs; Atuin overrides Ctrl+R next)
