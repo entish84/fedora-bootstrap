@@ -415,11 +415,19 @@ nvim
 #   <leader>ff       - Fast fuzzy find files (fzf-lua)
 #   <leader>fg       - Live grep in workspace
 #   <leader>e        - Fast file tree / directory browser (mini.files)
+#   <C-\> / <leader>tt - Toggle floating terminal (toggleterm)
+#   <leader>th       - Toggle horizontal bottom terminal drawer
+#   <leader>rr       - dotnet run (Interactive terminal)
+#   <leader>rw       - dotnet watch run (Hot-reload development server)
+#   <leader>rb       - dotnet build (Colorized terminal output)
+#   <leader>rB       - dotnet build (Neovim Quickfix error navigation)
+#   <leader>rt       - dotnet test (Run tests in terminal)
+#   <leader>rc       - dotnet clean
 #   <leader>ca       - Code Action / Roslyn quick fixes
 #   <leader>cf       - Code formatting (csharpier / ruff / prettier / rustfmt)
 #   <leader>cr       - Rename symbol
-#   <leader>da       - Debug .NET C# application (netcoredbg DAP)
-#   <leader>tc       - Run C# unit tests (neotest-dotnet)
+#   <leader>dc       - Debug .NET C# application (netcoredbg DAP)
+#   <leader>db       - Toggle debugger breakpoint
 # Check plugin and LSP status:
 #   :Lazy
 #   :Mason

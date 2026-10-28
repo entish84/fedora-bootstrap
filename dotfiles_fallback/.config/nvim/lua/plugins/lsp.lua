@@ -40,6 +40,7 @@ return {
         "lua_ls",         -- Lua / Neovim config
       },
       automatic_installation = true,
+      automatic_enable = false,
     },
     config = function(_, opts)
       local mason_lspconfig = require("mason-lspconfig")
