@@ -1,15 +1,80 @@
--- Antigravity CLI (agy) AI Pair Programming Integration
+-- AI Suite: Antigravity CLI (agy), CodeCompanion.nvim (Zed-style Chat/Diffs) & Minuet AI (Autocomplete)
 return {
+  -- 1. CodeCompanion.nvim: Pure Lua In-Editor Chat, Inline Diffs & Action Palette (Ollama Powered)
   {
-    "akinsho/toggleterm.nvim",
-    optional = true,
+    "olimorris/codecompanion.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    cmd = { "CodeCompanion", "CodeCompanionChat", "CodeCompanionActions" },
+    keys = {
+      { "<leader>ac", "<cmd>CodeCompanionChat Toggle<cr>", desc = "CodeCompanion Chat", mode = { "n", "v" } },
+      { "<leader>ai", "<cmd>CodeCompanion<cr>", desc = "CodeCompanion Inline Assistant", mode = { "n", "v" } },
+      { "<leader>ap", "<cmd>CodeCompanionActions<cr>", desc = "CodeCompanion Action Palette", mode = { "n", "v" } },
+      { "ga", "<cmd>CodeCompanion<cr>", desc = "CodeCompanion Inline", mode = { "n", "v" } },
+    },
+    opts = {
+      strategies = {
+        chat = {
+          adapter = "ollama",
+        },
+        inline = {
+          adapter = "ollama",
+        },
+      },
+      adapters = {
+        ollama = function()
+          return require("codecompanion.adapters").extend("ollama", {
+            schema = {
+              model = {
+                default = "qwen2.5-coder:7b",
+              },
+            },
+          })
+        end,
+      },
+      display = {
+        action_palette = {
+          provider = "default",
+        },
+        chat = {
+          window = {
+            layout = "vertical",
+            width = 0.4,
+          },
+        },
+      },
+    },
   },
+
+  -- 2. Minuet AI: LLM Code Autocompletion Provider for Blink.cmp (Ollama FIM)
   {
-    "folke/which-key.nvim",
-    optional = true,
+    "milanglacier/minuet-ai.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    opts = {
+      provider = "openai_fim_compatible",
+      n_completions = 1,
+      context_window = 1024,
+      provider_options = {
+        openai_fim_compatible = {
+          api_key = "TERM",
+          name = "Ollama",
+          end_point = "http://localhost:11434/v1/completions",
+          model = "qwen2.5-coder:7b",
+          optional = {
+            max_tokens = 64,
+            top_p = 0.9,
+          },
+        },
+      },
+    },
   },
+
+  -- 3. Antigravity CLI (agy) Agentic Pair Programming Bridge
   {
-    -- Virtual plugin specification to configure AGY actions
     dir = vim.fn.stdpath("config"),
     name = "antigravity-ai",
     keys = {
@@ -22,7 +87,7 @@ return {
     config = function()
       local Terminal = require("toggleterm.terminal").Terminal
 
-      -- 1. Floating Antigravity CLI Agent Window
+      -- Floating Antigravity CLI Agent Window
       local agy_terminal = Terminal:new({
         cmd = "agy",
         direction = "float",
@@ -43,7 +108,7 @@ return {
         agy_terminal:toggle()
       end, { desc = "Toggle Antigravity AI Agent" })
 
-      -- 2. Helper to display markdown output in floating scratchpad
+      -- Helper to display markdown output in floating scratchpad
       local function show_markdown_float(title, content)
         local buf = vim.api.nvim_create_buf(false, true)
         vim.bo[buf].filetype = "markdown"
@@ -76,7 +141,7 @@ return {
         end, { buffer = buf, silent = true, desc = "Close Float" })
       end
 
-      -- 3. Extract text from visual selection or whole buffer
+      -- Extract text from visual selection or whole buffer
       local function get_code_context(is_visual)
         if is_visual then
           local start_pos = vim.fn.getpos("'<")
@@ -91,7 +156,7 @@ return {
         end
       end
 
-      -- 4. Dispatch prompt to `agy -p`
+      -- Dispatch prompt to `agy -p`
       local function run_agy_prompt(action_name, instruction, is_visual)
         local code = get_code_context(is_visual)
         if not code or code:match("^%s*$") then

@@ -433,12 +433,16 @@ nvim
 #   <leader>ws       - Start Live Server (auto-launches Zen Browser on :5500)
 #   <leader>wS       - Stop Live Server
 #   <leader>we       - Emmet wrap with abbreviation
-#   -- Antigravity AI (agy):
+#   -- AI Suite (Antigravity agy, CodeCompanion, Minuet):
 #   <leader>aa       - Toggle Antigravity AI Agent (Floating TUI)
+#   <leader>ac       - Toggle CodeCompanion Chat (Ollama qwen2.5-coder)
+#   <leader>ai / ga  - CodeCompanion Inline Assistant (modify selection / generate)
+#   <leader>ap       - CodeCompanion Action Palette
 #   <leader>ar       - AGY Code Review & Security Audit
 #   <leader>ae       - AGY Explain Code
 #   <leader>af       - AGY Fix / Refactor Code
 #   <leader>ag       - AGY Generate Unit Tests
+#   (Minuet AI provides real-time LLM autocompletion directly inside blink.cmp)
 #   -- LSP & Debug:
 #   <leader>ca       - Code Action / Roslyn quick fixes
 #   <leader>cf       - Code formatting (csharpier / ruff / prettier / rustfmt)
