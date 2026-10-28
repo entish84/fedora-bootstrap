@@ -34,6 +34,6 @@ class MultimediaTask(BaseTask):
         run_root("dnf update -y @sound-and-video --exclude=libheif-freeworld", ctx, check=False, capture=False)
 
         # 4. PipeWire & WirePlumber
-        run_root("dnf install -y pipewire wireplumber pipewire-pulseaudio pipewire-alsa pipewire-gstreamer", ctx, check=False, capture=False)
+        # run_root("dnf install -y pipewire wireplumber pipewire-pulseaudio pipewire-alsa pipewire-gstreamer", ctx, check=False, capture=False)
 
         return True
