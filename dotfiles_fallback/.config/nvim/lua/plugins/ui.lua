@@ -39,14 +39,15 @@ return {
     opts = {
       preset = "modern",
       spec = {
+        { "<leader>a", group = "Antigravity AI (agy)" },
         { "<leader>b", group = "Buffers" },
         { "<leader>c", group = "Code & LSP" },
         { "<leader>d", group = "Debug (DAP)" },
         { "<leader>f", group = "Find & Grep" },
-        { "<leader>r", group = "Run & Build (.NET)" },
+        { "<leader>r", group = "Run & Build" },
         { "<leader>s", group = "Splits" },
         { "<leader>t", group = "Terminal & Test" },
-        { "<leader>w", group = "Windows / Save" },
+        { "<leader>w", group = "Web & Live Server" },
         { "<leader>x", group = "Diagnostics" },
       },
     },

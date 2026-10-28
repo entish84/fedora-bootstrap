@@ -17,7 +17,7 @@ return {
         "rust",
         "markdown",
         "markdown_inline",
-        -- Data & Configuration:
+        -- Web Templates & Data:
         "json",
         "yaml",
         "toml",

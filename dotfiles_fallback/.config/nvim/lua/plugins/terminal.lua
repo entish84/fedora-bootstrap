@@ -1,4 +1,4 @@
--- Terminal Integration & Modern .NET Run / Build Workflows
+-- Terminal Integration, Live Web Server & Polyglot Run/Build Workflows
 return {
   {
     "akinsho/toggleterm.nvim",
@@ -8,12 +8,20 @@ return {
       { "<leader>tt", "<cmd>ToggleTerm direction=float<cr>", desc = "Terminal (Floating)" },
       { "<leader>th", "<cmd>ToggleTerm size=15 direction=horizontal<cr>", desc = "Terminal (Horizontal)" },
       { "<leader>tv", "<cmd>ToggleTerm size=80 direction=vertical<cr>", desc = "Terminal (Vertical)" },
+      -- .NET
       { "<leader>rr", desc = "dotnet run (Interactive)" },
       { "<leader>rw", desc = "dotnet watch run (Hot Reload)" },
       { "<leader>rb", desc = "dotnet build (Terminal)" },
       { "<leader>rB", desc = "dotnet build (Quickfix List)" },
       { "<leader>rt", desc = "dotnet test (Terminal)" },
       { "<leader>rc", desc = "dotnet clean" },
+      -- Python Web
+      { "<leader>ru", desc = "FastAPI / Uvicorn (uv run uvicorn --reload)" },
+      { "<leader>rf", desc = "Flask (uv run flask run --debug)" },
+      { "<leader>rd", desc = "Django (uv run python manage.py runserver)" },
+      -- Web Development (Live Server)
+      { "<leader>ws", desc = "Start Live Server (Zen Browser)" },
+      { "<leader>wS", desc = "Stop Live Server" },
     },
     opts = {
       open_mapping = [[<C-\>]],
@@ -42,7 +50,7 @@ return {
 
       local Terminal = require("toggleterm.terminal").Terminal
 
-      -- Dedicated persistent terminals for .NET workflows
+      -- 1. Dedicated persistent terminals for .NET workflows
       local dotnet_run = Terminal:new({
         cmd = "dotnet run",
         direction = "float",
@@ -112,6 +120,70 @@ return {
         vim.cmd("make")
         vim.cmd("copen")
       end, { desc = "dotnet build (Quickfix List)" })
+
+      -- 2. Dedicated Python Web Runners (FastAPI, Flask, Django via uv)
+      local uvicorn_server = Terminal:new({
+        cmd = "uv run uvicorn main:app --reload --port 8000",
+        direction = "horizontal",
+        size = 14,
+        close_on_exit = false,
+        hidden = true,
+      })
+
+      local flask_server = Terminal:new({
+        cmd = "uv run flask run --debug",
+        direction = "horizontal",
+        size = 14,
+        close_on_exit = false,
+        hidden = true,
+      })
+
+      local django_server = Terminal:new({
+        cmd = "uv run python manage.py runserver",
+        direction = "horizontal",
+        size = 14,
+        close_on_exit = false,
+        hidden = true,
+      })
+
+      vim.keymap.set("n", "<leader>ru", function()
+        uvicorn_server:toggle()
+      end, { desc = "FastAPI: Uvicorn Server (--reload)" })
+
+      vim.keymap.set("n", "<leader>rf", function()
+        flask_server:toggle()
+      end, { desc = "Flask: Dev Server (--debug)" })
+
+      vim.keymap.set("n", "<leader>rd", function()
+        django_server:toggle()
+      end, { desc = "Django: Run Server" })
+
+      -- 3. Dedicated Live Server for HTML/CSS/JS (auto-opens Zen Browser)
+      local live_server = nil
+
+      vim.keymap.set("n", "<leader>ws", function()
+        if not live_server then
+          live_server = Terminal:new({
+            cmd = "live-server --port=5500 --browser=zen-browser",
+            direction = "horizontal",
+            size = 12,
+            close_on_exit = false,
+            hidden = true,
+          })
+        end
+        live_server:open()
+        vim.notify("Live Server started at http://127.0.0.1:5500 (Zen Browser)", vim.log.levels.INFO)
+      end, { desc = "Start Live Server (Zen Browser)" })
+
+      vim.keymap.set("n", "<leader>wS", function()
+        if live_server then
+          live_server:shutdown()
+          live_server = nil
+          vim.notify("Live Server stopped.", vim.log.levels.INFO)
+        else
+          vim.notify("Live Server is not running.", vim.log.levels.WARN)
+        end
+      end, { desc = "Stop Live Server" })
 
       -- Convenient terminal navigation & exit
       function _G.set_terminal_keymaps()

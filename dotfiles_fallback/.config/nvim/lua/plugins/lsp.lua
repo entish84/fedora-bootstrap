@@ -38,6 +38,7 @@ return {
         "rust_analyzer",  -- Rust
         "marksman",       -- Markdown
         "lua_ls",         -- Lua / Neovim config
+        "emmet_language_server", -- Emmet expansion for HTML / CSS
       },
       automatic_installation = true,
       automatic_enable = false,
@@ -85,6 +86,7 @@ return {
         "rust_analyzer",
         "marksman",
         "lua_ls",
+        "emmet_language_server",
       }
 
       for _, server_name in ipairs(servers) do

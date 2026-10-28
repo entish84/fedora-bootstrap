@@ -417,12 +417,29 @@ nvim
 #   <leader>e        - Fast file tree / directory browser (mini.files)
 #   <C-\> / <leader>tt - Toggle floating terminal (toggleterm)
 #   <leader>th       - Toggle horizontal bottom terminal drawer
+#   -- .NET & Polyglot Run/Build:
 #   <leader>rr       - dotnet run (Interactive terminal)
 #   <leader>rw       - dotnet watch run (Hot-reload development server)
 #   <leader>rb       - dotnet build (Colorized terminal output)
 #   <leader>rB       - dotnet build (Neovim Quickfix error navigation)
 #   <leader>rt       - dotnet test (Run tests in terminal)
 #   <leader>rc       - dotnet clean
+#   -- Python Web (uv):
+#   <leader>ru       - FastAPI / Uvicorn server (--reload)
+#   <leader>rf       - Flask dev server (--debug)
+#   <leader>rd       - Django runserver
+#   <leader>cv       - Select Python VirtualEnv (venv-selector)
+#   -- Web Development (Live Server & Emmet):
+#   <leader>ws       - Start Live Server (auto-launches Zen Browser on :5500)
+#   <leader>wS       - Stop Live Server
+#   <leader>we       - Emmet wrap with abbreviation
+#   -- Antigravity AI (agy):
+#   <leader>aa       - Toggle Antigravity AI Agent (Floating TUI)
+#   <leader>ar       - AGY Code Review & Security Audit
+#   <leader>ae       - AGY Explain Code
+#   <leader>af       - AGY Fix / Refactor Code
+#   <leader>ag       - AGY Generate Unit Tests
+#   -- LSP & Debug:
 #   <leader>ca       - Code Action / Roslyn quick fixes
 #   <leader>cf       - Code formatting (csharpier / ruff / prettier / rustfmt)
 #   <leader>cr       - Rename symbol

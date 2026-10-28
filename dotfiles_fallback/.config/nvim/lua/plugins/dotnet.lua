@@ -62,7 +62,7 @@ return {
     end,
   },
 
-  -- 3. Unit Testing Runner: neotest with neotest-dotnet
+  -- 3. Unit Testing Runner: neotest with neotest-dotnet & neotest-python
   {
     "nvim-neotest/neotest",
     dependencies = {
@@ -70,19 +70,26 @@ return {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
       "Issafalcon/neotest-dotnet",
+      "nvim-neotest/neotest-python",
     },
     keys = {
       { "<leader>tr", function() require("neotest").run.run() end, desc = "Run Nearest Test" },
       { "<leader>tf", function() require("neotest").run.run(vim.fn.expand("%")) end, desc = "Run Test File" },
       { "<leader>ts", function() require("neotest").summary.toggle() end, desc = "Toggle Test Summary" },
+      { "<leader>tp", function() require("neotest").run.run({ suite = true }) end, desc = "Run Test Suite (Pytest / .NET)" },
     },
     opts = function()
+      local adapters = {
+        require("neotest-dotnet")({
+          dap = { args = { "--interpreter=vscode" } },
+        }),
+      }
+      local ok, neotest_python = pcall(require, "neotest-python")
+      if ok then
+        table.insert(adapters, neotest_python({ runner = "pytest" }))
+      end
       return {
-        adapters = {
-          require("neotest-dotnet")({
-            dap = { args = { "--interpreter=vscode" } },
-          }),
-        },
+        adapters = adapters,
       }
     end,
   },
