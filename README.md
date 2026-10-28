@@ -24,7 +24,7 @@ A modern, robust, and idempotent Python 3 system provisioning tool designed for 
 - **Native RPM IDEs & JetBrains Toolbox**:
   - VS Code installed natively via official Microsoft RPM repository.
   - JetBrains Toolbox automated native installation to `/opt/jetbrains-toolbox` with desktop integration and icon caches for Rider, Android Studio, and CLion without Flatpaks.
-  - Neovim with LazyVim pre-configured with a complete `.NET 10` C# toolchain (`mason-org/mason.nvim`, Roslyn/OmniSharp LSP, NetCoreDbg DAP, CSharpier formatting).
+  - **Modern Lean Neovim Native Pack** (<20ms startup): Built on Neovim 0.12 native LSP & lazy.nvim with Catppuccin Mocha theme, Which-Key v3 popup help (`<leader>?`), Blink.cmp (sub-2ms completion), Fzf-Lua, and a polyglot language toolchain (Official Microsoft Roslyn LSP for .NET 10 / C#, Pyright/Ruff for Python, ts_ls/Prettier for JS/TS/HTML/CSS, rust-analyzer for Rust, Marksman + render-markdown for Markdown).
 - **Dual Dotfiles Engine**:
   - Clones your GitHub dotfiles repository (`https://github.com/<user>/<repo>.git`).
   - Bundles a production-ready fallback dotfiles suite (`.zshrc`, `.zsh_aliases`, `kitty.conf`, `current-theme.conf`, `starship.toml`) with Charcoal-Amber theme.
@@ -281,7 +281,7 @@ The bundled fallback dotfiles (`.zsh_aliases`) and repository dotfiles include p
 ### Modern Applications & Editors
 | Alias | Expanded Command | Description |
 | :--- | :--- | :--- |
-| `v` | `nvim` | Launch Neovim with LazyVim & .NET 10 |
+| `v` | `nvim` | Launch Neovim with Modern Lean Native Pack & .NET 10 |
 | `z` | `zed` | Launch Zed Editor |
 | `zen` | `zen-browser` | Launch Zen Browser |
 | `tb` | `jetbrains-toolbox` | Launch JetBrains Toolbox |
@@ -407,11 +407,22 @@ which agy
 systemctl status ollama
 ollama list
 
-# Neovim with LazyVim & .NET 10
+# Neovim Modern Lean Native Pack (<20ms startup)
 nvim
-# Inside Neovim, check plugin and LSP status:
-# :Lazy
-# :Mason
+# Inside Neovim:
+#   <Space>          - Leader key (opens which-key menu)
+#   <leader>?        - Comprehensive keybinding cheatsheet popup
+#   <leader>ff       - Fast fuzzy find files (fzf-lua)
+#   <leader>fg       - Live grep in workspace
+#   <leader>e        - Fast file tree / directory browser (mini.files)
+#   <leader>ca       - Code Action / Roslyn quick fixes
+#   <leader>cf       - Code formatting (csharpier / ruff / prettier / rustfmt)
+#   <leader>cr       - Rename symbol
+#   <leader>da       - Debug .NET C# application (netcoredbg DAP)
+#   <leader>tc       - Run C# unit tests (neotest-dotnet)
+# Check plugin and LSP status:
+#   :Lazy
+#   :Mason
 ```
 
 ### 4. Docker Permissions
@@ -460,13 +471,18 @@ python3 -m unittest tests.test_dry_run_pipeline
 ```
 fedora-bootstrap/
 ├── bootstrap.py                 # Main CLI runner (18 tasks pipeline)
-├── dotfiles_fallback/           # Bundled fallback dotfiles (Charcoal-Amber suite)
+├── dotfiles_fallback/           # Bundled fallback dotfiles & Modern Neovim pack
 │   ├── .zshrc
 │   ├── .zsh_aliases
 │   └── .config/
 │       ├── kitty/
 │       │   ├── kitty.conf
 │       │   └── current-theme.conf
+│       ├── nvim/                # Modern Lean Neovim Native Pack (Catppuccin, Roslyn, Blink)
+│       │   ├── init.lua
+│       │   └── lua/
+│       │       ├── config/      # options, keymaps, autocmds
+│       │       └── plugins/     # ui, editor, lsp, dotnet, completion, treesitter, markdown, etc.
 │       └── starship.toml
 ├── core/
 │   ├── context.py               # Runtime context & user detection
@@ -487,7 +503,7 @@ fedora-bootstrap/
 │   ├── wallpapers.py            # GitHub minimal wallpapers & theme hook
 │   ├── virtualization.py        # Docker-CE, Podman, KVM user groups
 │   ├── shell_env.py             # Zsh default shell, Zinit, Mise runtimes (.NET 10)
-│   ├── neovim_dotnet.py         # LazyVim with .NET 10 LSP/DAP (mason-org)
+│   ├── neovim_dotnet.py         # Modern Lean Neovim pack with Roslyn .NET 10 LSP/DAP
 │   ├── ides.py                  # JetBrains Toolbox & native VS Code RPM
 │   ├── optional_apps.py         # Antigravity CLI, Zed, Zen, Ollama, LibreOffice, Waydroid, LocalSend
 │   ├── dotfiles.py              # GitHub clone OR Fallback symlinking

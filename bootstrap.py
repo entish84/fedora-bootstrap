@@ -170,7 +170,7 @@ def run_wizard(ctx: ExecutionContext) -> None:
     ide_options = [
         ("jetbrains_toolbox", "JetBrains Toolbox (Native /opt - manages Rider, Android Studio, CLion)", True),
         ("vscode", "Visual Studio Code (Native RPM from Microsoft)", True),
-        ("neovim", "Neovim with LazyVim & .NET 10 Ready (OmniSharp/Roslyn LSP, DAP, CSharpier)", True),
+        ("neovim", "Neovim Modern Lean Pack (Microsoft Roslyn .NET 10, Polyglot LSP, Catppuccin)", True),
     ]
     ctx.selected_ides = prompt_checkboxes(
         "Select development environments and editors to install (Native RPMs only, no Flatpaks):",
